@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Table(name="user_account")
  */
-class User
+class User implements UserInterface
 {
     /**
      * @ORM\Id()
@@ -19,244 +19,96 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=180, unique=true)
      */
-    private $firstname;
+    private $email;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="json")
      */
-    private $lastname;
+    private $roles = [];
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @var string The hashed password
+     * @ORM\Column(type="string")
      */
-    private $mail;
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $pseudo;
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $role;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Faq", mappedBy="User_idUser")
-     */
-    private $faqs;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="User_id")
-     */
-    private $comments;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Proposition", mappedBy="User_id")
-     */
-    private $propositions;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Mark", mappedBy="User_id")
-     */
-    private $marks;
-
-    public function __construct()
-    {
-        $this->faqs = new ArrayCollection();
-        $this->comments = new ArrayCollection();
-        $this->propositions = new ArrayCollection();
-        $this->marks = new ArrayCollection();
-    }
+    private $password;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getFirstname(): ?string
+    public function getEmail(): ?string
     {
-        return $this->firstname;
+        return $this->email;
     }
 
-    public function setFirstname(string $firstname): self
+    public function setEmail(string $email): self
     {
-        $this->firstname = $firstname;
-
-        return $this;
-    }
-
-    public function getLastname(): ?string
-    {
-        return $this->lastname;
-    }
-
-    public function setLastname(string $lastname): self
-    {
-        $this->lastname = $lastname;
-
-        return $this;
-    }
-
-    public function getMail(): ?string
-    {
-        return $this->mail;
-    }
-
-    public function setMail(string $mail): self
-    {
-        $this->mail = $mail;
-
-        return $this;
-    }
-
-    public function getPseudo(): ?string
-    {
-        return $this->pseudo;
-    }
-
-    public function setPseudo(string $pseudo): self
-    {
-        $this->pseudo = $pseudo;
-
-        return $this;
-    }
-
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
-    public function setRole(string $role): self
-    {
-        $this->role = $role;
+        $this->email = $email;
 
         return $this;
     }
 
     /**
-     * @return Collection|Faq[]
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
      */
-    public function getFaqs(): Collection
+    public function getUsername(): string
     {
-        return $this->faqs;
+        return (string) $this->email;
     }
 
-    public function addFaq(Faq $faq): self
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        if (!$this->faqs->contains($faq)) {
-            $this->faqs[] = $faq;
-            $faq->setUserIdUser($this);
-        }
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
 
-        return $this;
+        return array_unique($roles);
     }
 
-    public function removeFaq(Faq $faq): self
+    public function setRoles(array $roles): self
     {
-        if ($this->faqs->contains($faq)) {
-            $this->faqs->removeElement($faq);
-            // set the owning side to null (unless already changed)
-            if ($faq->getUserIdUser() === $this) {
-                $faq->setUserIdUser(null);
-            }
-        }
+        $this->roles = $roles;
 
         return $this;
     }
 
     /**
-     * @return Collection|Comment[]
+     * @see UserInterface
      */
-    public function getComments(): Collection
+    public function getPassword(): string
     {
-        return $this->comments;
+        return (string) $this->password;
     }
 
-    public function addComment(Comment $comment): self
+    public function setPassword(string $password): self
     {
-        if (!$this->comments->contains($comment)) {
-            $this->comments[] = $comment;
-            $comment->setUserId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComment(Comment $comment): self
-    {
-        if ($this->comments->contains($comment)) {
-            $this->comments->removeElement($comment);
-            // set the owning side to null (unless already changed)
-            if ($comment->getUserId() === $this) {
-                $comment->setUserId(null);
-            }
-        }
+        $this->password = $password;
 
         return $this;
     }
 
     /**
-     * @return Collection|Proposition[]
+     * @see UserInterface
      */
-    public function getPropositions(): Collection
+    public function getSalt()
     {
-        return $this->propositions;
-    }
-
-    public function addProposition(Proposition $proposition): self
-    {
-        if (!$this->propositions->contains($proposition)) {
-            $this->propositions[] = $proposition;
-            $proposition->setUserId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProposition(Proposition $proposition): self
-    {
-        if ($this->propositions->contains($proposition)) {
-            $this->propositions->removeElement($proposition);
-            // set the owning side to null (unless already changed)
-            if ($proposition->getUserId() === $this) {
-                $proposition->setUserId(null);
-            }
-        }
-
-        return $this;
+        // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
     /**
-     * @return Collection|Mark[]
+     * @see UserInterface
      */
-    public function getMarks(): Collection
+    public function eraseCredentials()
     {
-        return $this->marks;
-    }
-
-    public function addMark(Mark $mark): self
-    {
-        if (!$this->marks->contains($mark)) {
-            $this->marks[] = $mark;
-            $mark->setUserId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMark(Mark $mark): self
-    {
-        if ($this->marks->contains($mark)) {
-            $this->marks->removeElement($mark);
-            // set the owning side to null (unless already changed)
-            if ($mark->getUserId() === $this) {
-                $mark->setUserId(null);
-            }
-        }
-
-        return $this;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 }
