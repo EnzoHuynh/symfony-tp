@@ -2,13 +2,23 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\DeletedTrait;
+use App\Entity\Traits\TimestampableTrait;
+use App\Entity\Traits\PublishedTrait;
+use App\Entity\Traits\ArchivedTrait;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\FaqRepository")
  */
 class Faq
 {
+    use TimestampableTrait;
+    use DeletedTrait;
+    use PublishedTrait;
+    use ArchivedTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -18,11 +28,13 @@ class Faq
 
     /**
      * @ORM\Column(type="string", length=150)
+     * @Assert\NotNull()
      */
     private $title;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\NotNull()
      */
     private $description;
 

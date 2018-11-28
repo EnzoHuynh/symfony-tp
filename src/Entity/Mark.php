@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\DeletedTrait;
+use App\Entity\Traits\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -9,6 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Mark
 {
+    use TimestampableTrait;
+    use DeletedTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

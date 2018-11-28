@@ -2,15 +2,25 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\DeletedTrait;
+use App\Entity\Traits\TimestampableTrait;
+use App\Entity\Traits\PublishedTrait;
+use App\Entity\Traits\ArchivedTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PropositionRepository")
  */
 class Proposition
 {
+    use TimestampableTrait;
+    use DeletedTrait;
+    use PublishedTrait;
+    use ArchivedTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -20,6 +30,7 @@ class Proposition
 
     /**
      * @ORM\Column(type="string", length=150)
+     * @Assert\NotNull()
      */
     private $title;
 
@@ -30,6 +41,7 @@ class Proposition
 
     /**
      * @ORM\Column(type="string", length=30)
+     * @Assert\NotNull()
      */
     private $status;
 

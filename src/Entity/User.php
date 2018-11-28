@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\DeletedTrait;
+use App\Entity\Traits\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -11,6 +14,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
+    use TimestampableTrait;
+    use DeletedTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -20,6 +26,8 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\Email()
+     * @Assert\NotNull()
      */
     private $email;
 
@@ -31,6 +39,7 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\Length(min="6", max="16")
      */
     private $password;
 
